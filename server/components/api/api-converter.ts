@@ -1,12 +1,16 @@
 import * as fs from 'fs';
 
+// encapsulate this code to a reusable function
 try {
     // get metadata on the file (we need the file size)
-    let fileData = fs.statSync(__dirname + '/dummy.properties');
+    const fileData = fs.statSync(__dirname + '/dummy.properties');
     // create ArrayBuffer to hold the file contents
-    let dataBuffer = new ArrayBuffer(fileData['size']);
+    const dataBuffer = new ArrayBuffer(fileData['size']);
     const dataBufferVerified = new Uint8Array(dataBuffer as ArrayBuffer);
     // read the contents of the file into the ArrayBuffer
+    
+    // Always use async version when reading files
+    // Better to use read stream
     fs.readSync(
         fs.openSync(__dirname + '/dummy.properties', 'r'),
         dataBufferVerified,
@@ -15,17 +19,17 @@ try {
         0
     );
     // convert the ArrayBuffer into a string
-    let data = String.fromCharCode.apply(
+    const data = String.fromCharCode.apply(
         null,
         new Uint16Array(dataBufferVerified)
     );
     // split the contents into lines
-    let dataLines = data.split(/\r?\n/);
+    const dataLines = data.split(/\r?\n/);
     // filter out lines with specific word
-    var dataLinesFilteredArray = dataLines.filter((arr) =>
+    const dataLinesFilteredArray = dataLines.filter((arr) =>
         arr.includes('apiendpoint')
     );
-    console.log('dataLinesFilteredArray: ', dataLinesFilteredArray);
+
     fs.createWriteStream(
         __dirname + 'dummy-2.properties',
         JSON.parse(JSON.stringify(dataLinesFilteredArray))
